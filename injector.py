@@ -128,7 +128,7 @@ if choice == "1":
     while True:
         hidden_msg = str_to_bin(input("message to hide: "))
         if len(hidden_msg)*7 > (max_len := 2**len(img[0])) or\
-            len(hidden_msg)*7 > (max_len := len(img[0]) * len(img[:1:])):
+            len(hidden_msg)*7 > (max_len := len(img[0]) * len(img[1:])):
         
             print(f"message exeeds maximum leght({max_len} char)")
         else:
