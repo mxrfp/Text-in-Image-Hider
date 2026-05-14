@@ -35,15 +35,18 @@ def inject(image: list, bin_message: list[str]):
     for y, row in enumerate(image[1:]):
         injected_row = []
         for x, pixel in enumerate(row):
+            last_x = x
             if bin_msg_copy:
                 changed_bin = int(bin(pixel[0])[2:][:-1:] + bin_msg_copy[0], 2)
                 bin_msg_copy = bin_msg_copy[1:]
                 injected_row.append([changed_bin] + pixel[1:])
             else:
-                last_x = x
+                injected_img.append(injected_row + image[y+1][last_x:])
+                injected_row = []
                 break
-        injected_img.append(injected_row + image[y+1][last_x:]) #type: ignore
-    
+        if injected_row:
+            injected_img.append(injected_row)
+        
     return Image.fromarray(np.array(injected_img, dtype=np.uint8))
                 
 
@@ -69,11 +72,10 @@ def decode(image: list) -> str:
 
     for row in image[1: complete_rows+1]:
         for pixel in row:
-            if len(char) < 7:
-                char += bin(pixel[0])[-1]
-            else:
+            if len(char) == 7:
                 message += chr(int(char, 2))
                 char = ""
+            char += bin(pixel[0])[-1]
     
     for pixel in image[complete_rows+1][:partial_row:]:
         if len(char) == 7:
@@ -116,8 +118,8 @@ while True:
         img = img.tolist()
         print("Loaded into memory!")
         break
-    except FileNotFoundError:
-        print("File was not found")
+    except:
+        print("File was not found / Is not valid")
         if input("Type 'exit' to exit(any other key to continue): ") == "exit":
             exit()
 
